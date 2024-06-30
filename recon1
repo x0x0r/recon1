@@ -1,0 +1,38 @@
+1. cari domain dengan subfinder
+
+sunfinder -d test.com all -o test.txt
+
+2. cari yang aktif 
+
+cat test.txt | httpx > final.txt
+
+3. cari subjs
+
+cat final.txt | subjs > finals.txt
+
+4. cari javascrip nya
+
+katana -u test.com -jc | grep ".js$"
+
+
+katana -list (kalo mau pake list ) finals.txt -jc -v | grep "".js$" > finakkatana.txt
+
+
+bisa juga pake silent 
+
+katana -list (kalo mau pake list ) finals.txt -jc -silent | grep "".js$" > finakkatana.txt
+
+tanpa verbose atau silent
+
+katana -list (kalo mau pake list ) finals.txt -jc | grep "".js$" -o finalkatana2.txt
+
+
+katana -list finals.txt -jc -o finalkatana.txt | grep "".js$"
+
+
+cari secret finder
+
+
+cat finalkatana.txt | while read url; do python3 SecretFinder/SecretFinder.py -i $url -o cli > secret.txt; done
+
+cat finalkatana.txt | while read url; do python3 SecretFinder/SecretFinder.py -i $url -o cli; done
