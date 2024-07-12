@@ -36,3 +36,21 @@ cari secret finder
 cat finalkatana.txt | while read url; do python3 SecretFinder/SecretFinder.py -i $url -o cli > secret.txt; done
 
 cat finalkatana.txt | while read url; do python3 SecretFinder/SecretFinder.py -i $url -o cli; done
+
+
+vuln
+https://sploitus.com/
+https://sploitus.com/exploit?id=4D0DD59C-C302-5F17-9F2F-6F14B03B5396
+
+https://sploitus.com/exploit?id=435DDE7B-9594-5166-A4B0-569A4A544907
+
+https://sploitus.com/exploit?id=12AB39D5-D90E-5325-91D6-55FFA8CB8045
+
+https://github.com/bigb0x/CVE-2024-36991/tree/main
+
+https://github.com/bigb0x/CVE-2024-36991
+
+https://sploitus.com/exploit?id=E63F203E-162E-5C52-B7FF-ACA9E30C9D78
+
+https://github.com/A-little-dragon/CVE-2024-39943-Exploit
+
