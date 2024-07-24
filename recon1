@@ -75,3 +75,14 @@ https://exploit-notes.hdks.org/exploit/web/security-risk/prototype-pollution-in-
 https://exploit-notes.hdks.org/exploit/web/security-risk/ssrf/
 
 https://exploit-notes.hdks.org/exploit/web/security-risk/os-command-injection/
+
+
+
+
+
+
+Subresource Integrity (SRI) is a security feature that enables browsers to verify that third-party resources they fetch (for example, from a CDN) are delivered without unexpected manipulation. It works by allowing developers to provide a cryptographic hash that a fetched file must match.
+
+Third-party resources (such as scripts and stylesheets) can be manipulated. An attacker that has access or has hacked the hosting CDN can manipulate or replace the files. SRI allows developers to specify a base64-encoded cryptographic hash of the resource to be loaded. The integrity attribute containing the hash is then added to the <script> HTML element tag. The integrity string consists of a base64-encoded hash, followed by a prefix that depends on the hash algorithm. This prefix can either be sha256, sha384 or sha512.
+
+The script loaded from the external URL specified in the Details section doesn't implement Subresource Integrity (SRI). It's recommended to implement Subresource Integrity (SRI) for all the scripts loaded from external hosts.
