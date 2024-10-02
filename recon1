@@ -88,3 +88,35 @@ Subresource Integrity (SRI) is a security feature that enables browsers to verif
 Third-party resources (such as scripts and stylesheets) can be manipulated. An attacker that has access or has hacked the hosting CDN can manipulate or replace the files. SRI allows developers to specify a base64-encoded cryptographic hash of the resource to be loaded. The integrity attribute containing the hash is then added to the <script> HTML element tag. The integrity string consists of a base64-encoded hash, followed by a prefix that depends on the hash algorithm. This prefix can either be sha256, sha384 or sha512.
 
 The script loaded from the external URL specified in the Details section doesn't implement Subresource Integrity (SRI). It's recommended to implement Subresource Integrity (SRI) for all the scripts loaded from external hosts.
+
+
+
+
+cara recon 
+
+
+1. magicrecon.sh -w ( domain )
+
+2 . dirsearch -u "domain" -x 301,403,404,500,400,502,503,302,429 --random-agent --deep recursive
+
+3. dirsearch -u "domain" -e conf, config, bak, backup, smp, old, sql, asp, aspx, py, rb, tar.gz, tmp, tar, tar.bz2, tar.gz, txt, wadl, zip, log, xml, js, json
+
+4 . subfinder -d (domain) --all -o tsubdomain.txt
+
+5. cat tsubdomain.txt | httpx -sc -title -server -td -t 160 --random-agent
+
+6. katana -u tsubdomain.txt -d 5 -ps -pss waybackarchive,commoncrawl,alienvault -jc -fx -ef woff,css,png,svg,jpg,woffw,jpeg,gif,svg, -o allurls1.txt
+
+7. cat allurls | gf lfi | nuclei -tags lfi
+
+8. cat allurl.txt | grep -E "\.txt|\.log|\.cache|\.secret|\.db|\.backup|\.yml|\.json|\.gz|\.rar|\.zip|_config"
+
+9. dirsearch -l tsubdomain.txt -e conf, config, bak, backup, smp, old, sql, asp, aspx, py, rb, tar.gz, tmp, tar, tar.bz2, tar.gz, txt, wadl, zip, log, xml, js, json
+
+10. cat subdomain.txt | httpx -mc 200, 302 -o  livesubdomain.txt
+
+11. ghauri -m sql.txt --batch --dbs --level 3 --confirm
+
+12. sqlmap -m sql.txt --batch --dbs --current-db --random-agent --tamper=space2comment,symboliclogical
+
+13.  nuclei -l tsubdomain.txt -tags cves, osint, tech
