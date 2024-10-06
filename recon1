@@ -120,3 +120,22 @@ cara recon
 12. sqlmap -m sql.txt --batch --dbs --current-db --random-agent --tamper=space2comment,symboliclogical
 
 13.  nuclei -l tsubdomain.txt -tags cves, osint, tech
+
+
+part2 cara recon
+
+1. subfinder -d (namadomain) -all recursive -o subdomain.txt
+
+2. cat subdomain.txt | httpx-toolkit -ports 80,443,8080,800,888 -threads 200 > subdomains_alive.txt
+
+3. katana -u tsubdomain.txt -d 5 -ps -pss waybackarchive,commoncrawl,alienvault -kf -jc -fx -ef woff,css,png,svg,jpg,woff2,jpeg,gif,svg, -o allurls1.txt
+
+4. cat allurls.txt | grep -E "\.txt|\.log|\.cache|\.secret|\.db|\.backup|\.yml|\.json|\.gz|\.rar|\.zip|\.config|\.bak"
+
+5. cat allurls.txt | grep -E "\.js$" >> js.txt
+
+6. cat js.txt | nuclei -t http/exposures/
+
+7. echo nama domain | katana -ps | grep -E "\.js$"| nuclei -t /http/exposures/ -c 30
+
+8. 
