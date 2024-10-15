@@ -152,6 +152,18 @@ part2 cara recon
 
 13. cat allurls | gf lfi | nuclei -tags lfi 
 
+
+
+contoh recon subfinder
+
+how to use in bug bounty programs:
+subfinder -d xyz.com -all  | nuclei -t crlf.yaml -rl 50
+subfinder -d xyz.com -all  | nuclei -t openRedirect.yaml -rl 100
+subfinder -d xyz.com -all  | nuclei -t iis.yaml
+subfinder -d xyz.com -all  | nuclei -t cors.yaml -rl 100
+subfinder -d xyz.com -all  | waybackurls | gf sqli | uro | nuclei -t errorsqli.yaml -rl 50
+
+
 14. cat allurls.txt | gf redirect | openredirex  -p /home/x/Desktop/git/OpenRedireX/payloads.txt | anew openredirex2.txt
 
 15. #cat subdomains_alive.txt | nuclei -t /root/nuclei-templates/cRlf.yam -v
