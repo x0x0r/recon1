@@ -170,6 +170,9 @@ subfinder -d xyz.com -all  | nuclei -t iis.yaml
 subfinder -d xyz.com -all  | nuclei -t cors.yaml -rl 100
 subfinder -d xyz.com -all  | waybackurls | gf sqli | uro | nuclei -t errorsqli.yaml -rl 50
 
+#cat allurls.txt | nuclei -t /home/x/Desktop/git/nuclei-templates --retries 2 --dast
+
+
 
 14. cat allurls.txt | gf redirect | openredirex  -p /home/x/Desktop/git/OpenRedireX/payloads.txt | anew openredirex2.txt
 
