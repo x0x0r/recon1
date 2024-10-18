@@ -172,7 +172,9 @@ subfinder -d xyz.com -all  | waybackurls | gf sqli | uro | nuclei -t errorsqli.
 
 #cat allurls.txt | nuclei -t /home/x/Desktop/git/nuclei-templates --retries 2 --dast
 
+debug javacheck
 
+https://obfuscator.io/#output
 
 14. cat allurls.txt | gf redirect | openredirex  -p /home/x/Desktop/git/OpenRedireX/payloads.txt | anew openredirex2.txt
 
