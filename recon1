@@ -181,3 +181,5 @@ https://obfuscator.io/#output
 15. #cat subdomains_alive.txt | nuclei -t /root/nuclei-templates/cRlf.yam -v
 
 16. cat allurls.txt | gf redirect | openredirex
+
+cat allurls.txt | gau | urldedupe -s | gf sqli | nuclei -t /root/nuclei-templates/dast/vulnerabilities --dast -proxy socks5://127.0.0.1:9050 | anew all-nuc.txt
