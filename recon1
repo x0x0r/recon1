@@ -119,6 +119,8 @@ cara recon
 
 6. katana -u tsubdomain.txt -d 5 -ps -pss waybackarchive,commoncrawl,alienvault -jc -fx -ef woff,css,png,svg,jpg,woffw,jpeg,gif,svg, -o allurls1.txt
 
+6.2 katana baru #katana -u subdomains_alive.txt -d 5 -iqp -cs -v -debug  waybackarchive,commoncrawl,alienvault -r -d -kf -jc -fx -ef woff,css,png,svg,jpg,woff2,jpeg,gif,svg, | tee allurls-new.txt
+
 7. cat allurls | gf lfi | nuclei -tags lfi
 
 8. cat allurl.txt | grep -E "\.txt|\.log|\.cache|\.secret|\.db|\.backup|\.yml|\.json|\.gz|\.rar|\.zip|_config"
