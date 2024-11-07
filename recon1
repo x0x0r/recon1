@@ -195,3 +195,9 @@ cat allurls.txt | waybackurls | urldedupe -s qs -ne | gf xss | qsreplace '"><img
 
 xss
 https://xsshunter.trufflesecurity.com/app/#/xsspayloads
+
+
+sqlinjection curl
+
+time curl -X POST -d "isi patern nya " https://alamatdomain.txt
+
