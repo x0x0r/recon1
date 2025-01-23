@@ -227,4 +227,15 @@ cat jss.txt | xargs -I{} bash -c 'echo  -e "\ntarget : {}\n" && python /home/x/D
 sqlmap -u https://link.uma.me/login --data "*","password":"test" --batch --flush-session
 
 
+repor github
+
+https://github.com/0xTeles/jsleak
+
+https://github.com/odomojuli?tab=repositories
+
+https://github.com/KaioGomesx/JSScanner/tree/main
+
+https://github.com/0x240x23elu/JSScanner
+
+
 
