@@ -201,3 +201,24 @@ sqlinjection curl
 
 time curl -X POST -d "isi patern nya " https://alamatdomain.txt
 
+
+katana -u domain.com -d 5 -jc | grep '\.js$' | tee alljs.txt
+
+echo domain.txt | gau | grep '\.js$' | tee alljs.txt
+
+
+#cat allurls-new.txt | uro | sort -u | httpx-toolkit -mc 200 | anew uro.txt
+
+
+#cat allurls-new.txt | jsleak -s -l -k | anew jsleak.txt
+
+#cat allurls-new.txt | nuclei -t /root/nuclei-templates/credentials-disclosure-all.yaml -c 30
+
+[credentials-disclosure-all] [http] [medium] https://pennywall.uma.me/_next/static/chunks/polyfills-42372ed130431b0a.js ["https://a@"]
+
+
+https://github.com/schooldropout1337/lazyegg.git
+
+
+cat jss.txt | xargs -I{} bash -c 'echo  -e "\ntarget : {}\n" && python /home/x/Desktop/git/lazyegg/lazyegg.py "{}" --js_urls --domains --ips --leaked_creds --local_storage'
+
