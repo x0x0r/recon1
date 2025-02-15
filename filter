@@ -1,0 +1,3 @@
+filter 
+
+cat nama_file.txt | grep -o 'http[^ ]*\.js'
