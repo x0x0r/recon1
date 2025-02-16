@@ -164,7 +164,7 @@ part2 cara recon
 
 13. cat allurls | gf lfi | nuclei -tags lfi 
 14. katana -u d.txt -d 5 -jc | grep '\.js$' | tee alljs.txt
-
+15. cat alljs.txt | httpx-toolkit -mc 200 -o alljs-result.txt
 
 
 contoh recon subfinder
