@@ -163,6 +163,7 @@ part2 cara recon
 12. nuclei -list subdomains_alive -tags cves,osint,tech
 
 13. cat allurls | gf lfi | nuclei -tags lfi 
+14. katana -u d.txt -d 5 -jc | grep '\.js$' | tee alljs.txt
 
 
 
