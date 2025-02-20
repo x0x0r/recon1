@@ -1,3 +1,6 @@
 filter 
 
 cat nama_file.txt | grep -o 'http[^ ]*\.js'
+
+
+grep -Eo "https://[a-zA-Z0-9./?=_-]*" nama_file.txt | xargs -I {} curl -s -o /dev/null -w "%{http_code} {}" | grep "200" | cut -d' ' -f2
