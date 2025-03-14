@@ -272,3 +272,10 @@ https://www.youtube.com/watch?v=j4tr8iPcbT0
 https://exploit-notes.hdks.org/exploit/reconnaissance/
 
 https://www.hackingarticles.in/penetration-testing/
+
+
+ffuf burpsuite
+
+ffuf -u http://target.com/FUZZ -w /path/to/wordlist.txt -proxy http://127.0.0.1:8080
+ffuf -u http://example.com/FUZZ -w /path/to/wordlist.txt -proxy http://127.0.0.1:8080
+
