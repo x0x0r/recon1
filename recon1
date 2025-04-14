@@ -282,3 +282,4 @@ ffuf -u http://example.com/FUZZ -w /path/to/wordlist.txt -proxy http://127.0.0.1
 
 https://github.com/xiv3r?tab=repositories
 
+https://github.com/xiv3r/Burpsuite-Professional
