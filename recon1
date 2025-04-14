@@ -279,3 +279,6 @@ ffuf burpsuite
 ffuf -u http://target.com/FUZZ -w /path/to/wordlist.txt -proxy http://127.0.0.1:8080
 ffuf -u http://example.com/FUZZ -w /path/to/wordlist.txt -proxy http://127.0.0.1:8080
 
+
+https://github.com/xiv3r?tab=repositories
+
