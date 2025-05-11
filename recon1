@@ -227,6 +227,8 @@ cat jss.txt | xargs -I{} bash -c 'echo  -e "\ntarget : {}\n" && python /home/x/D
 
 sqlmap -u https://link.uma.me/login --data "*","password":"test" --batch --flush-session
 
+nuclei -u 192.16 -nmhe
+fungsi nmhe biar ga stop kalo ada error
 
 repor github
 
