@@ -1,0 +1,8 @@
+# Buat virtual environment baru
+python3 -m venv env
+
+# Aktifkan environment
+source env/bin/activate
+
+# Install package dalam environment ini
+pip install requests urllib3
