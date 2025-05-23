@@ -1,0 +1,16 @@
+Opsi Alternatif: Gunakan Tools Forensik Bawaan Parrot OS
+Parrot OS sudah menyediakan banyak tools forensik canggih, misalnya:
+
+Autopsy (GUI)
+
+Sleuth Kit (TSK - CLI)
+
+Volatility (Memory forensics)
+
+Plaso / log2timeline
+
+Binwalk, Foremost, Scalpel
+
+
+
+FTK (Forensic Toolkit)  Khusus windows
