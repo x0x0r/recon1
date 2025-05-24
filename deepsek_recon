@@ -1,0 +1,203 @@
+pip install requests beautifulsoup4 colorama
+
+
+import requests
+import argparse
+from urllib.parse import urlparse, urljoin, parse_qs
+from bs4 import BeautifulSoup
+import re
+import json
+from colorama import Fore, Style, init
+
+# Inisialisasi colorama
+init(autoreset=True)
+
+# Konfigurasi
+TIMEOUT = 10
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+}
+
+SENSITIVE_PATHS = [
+    '/.env', '/config.js', '/api/key', '/v1/token',
+    '/auth', '/oauth', '/internal', '/secret',
+    '/admin', '/backup', '/.git/config', '/robots.txt',
+    '/.aws/credentials', '/.htaccess', '/web.config'
+]
+
+API_KEY_REGEX = re.compile(
+    r'(?i)(api_key|apikey|secret|token|access_key|auth|password|credential)["\':= ]+([a-z0-9A-Z\-_+=]{20,100})'
+)
+
+def print_color(text, color):
+    print(color + text + Style.RESET_ALL)
+
+def get_forms(url, soup):
+    forms = []
+    for form in soup.find_all('form'):
+        form_details = {}
+        action = form.attrs.get('action', '').lower()
+        method = form.attrs.get('method', 'get').lower()
+        inputs = []
+        
+        for input_tag in form.find_all('input'):
+            input_name = input_tag.attrs.get('name')
+            input_type = input_tag.attrs.get('type', 'text')
+            inputs.append({'name': input_name, 'type': input_type})
+        
+        form_details['action'] = urljoin(url, action)
+        form_details['method'] = method
+        form_details['inputs'] = inputs
+        forms.append(form_details)
+    return forms
+
+def scan_js(url):
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+        if response.status_code == 200:
+            return API_KEY_REGEX.findall(response.text)
+    except:
+        return []
+    return []
+
+def scan_url(url):
+    results = {}
+    parameters = set()
+    sensitive_files = {}
+    js_findings = {}
+
+    try:
+        # Coba semua metode HTTP
+        for method in ['GET', 'POST', 'PUT']:
+            try:
+                if method == 'GET':
+                    response = requests.get(url, headers=HEADERS, timeout=TIMEOUT, allow_redirects=False)
+                elif method == 'POST':
+                    response = requests.post(url, headers=HEADERS, timeout=TIMEOUT, allow_redirects=False)
+                elif method == 'PUT':
+                    response = requests.put(url, headers=HEADERS, timeout=TIMEOUT, allow_redirects=False)
+                
+                status = response.status_code
+                if status in [200, 201, 302]:
+                    # Ekstrak parameter dari URL
+                    parsed = urlparse(url)
+                    params = parse_qs(parsed.query)
+                    parameters.update(params.keys())
+                    
+                    # Ekstrak parameter dari form
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    forms = get_forms(url, soup)
+                    for form in forms:
+                        parameters.update([input['name'] for input in form['inputs'] if input['name']])
+                    
+                    # Simpan hasil
+                    if status not in results:
+                        results[status] = {}
+                    if method not in results[status]:
+                        results[status][method] = []
+                    results[status][method].append(url)
+                    
+            except Exception as e:
+                continue
+
+        # Cari file sensitif
+        parsed = urlparse(url)
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
+        
+        for path in SENSITIVE_PATHS:
+            target_url = urljoin(base_url, path)
+            try:
+                response = requests.get(target_url, headers=HEADERS, timeout=TIMEOUT, allow_redirects=False)
+                if response.status_code == 200:
+                    sensitive_files[target_url] = response.status_code
+            except:
+                continue
+
+        # Cari API key di file JS
+        if url.endswith('.js'):
+            findings = scan_js(url)
+            if findings:
+                js_findings[url] = findings
+
+    except KeyboardInterrupt:
+        return None
+    except:
+        return results
+
+    return {
+        'results': results,
+        'parameters': parameters,
+        'sensitive_files': sensitive_files,
+        'js_findings': js_findings
+    }
+
+def main():
+    parser = argparse.ArgumentParser(description='Bug Bounty Hunting Scanner')
+    parser.add_argument('-i', '--input', required=True, help='Path to subdomains file')
+    args = parser.parse_args()
+
+    with open(args.input, 'r') as f:
+        subdomains = [line.strip() for line in f.readlines()]
+
+    all_results = {}
+    total_processed = 0
+
+    for url in subdomains:
+        total_processed += 1
+        print_color(f"\nScanning {url} ({total_processed}/{len(subdomains)})", Fore.CYAN)
+        
+        scan_result = scan_url(url)
+        if not scan_result:
+            continue
+        
+        # Gabungkan hasil
+        for status, methods in scan_result['results'].items():
+            if status not in all_results:
+                all_results[status] = {'methods': {}, 'parameters': set(), 'sensitive_files': {}, 'js_findings': {}}
+            
+            for method, urls in methods.items():
+                if method not in all_results[status]['methods']:
+                    all_results[status]['methods'][method] = []
+                all_results[status]['methods'][method].extend(urls)
+            
+            all_results[status]['parameters'].update(scan_result['parameters'])
+        
+        for file, code in scan_result['sensitive_files'].items():
+            all_results[code]['sensitive_files'][file] = code
+        
+        for js, findings in scan_result['js_findings'].items():
+            all_results[200]['js_findings'][js] = findings
+
+    # Print hasil
+    for status in sorted(all_results.keys()):
+        print_color(f"\n{'-'*40}", Fore.YELLOW)
+        print_color(f"Response Code: {status}", Fore.YELLOW)
+        print_color(f"{'-'*40}", Fore.YELLOW)
+        
+        # Print methods
+        for method, urls in all_results[status]['methods'].items():
+            print_color(f"\nMethod {method}:", Fore.GREEN)
+            for url in urls:
+                print(f"  {url}")
+        
+        # Print parameters
+        if all_results[status]['parameters']:
+            print_color("\nPotential Injection Parameters:", Fore.MAGENTA)
+            print(", ".join(all_results[status]['parameters']))
+        
+        # Print sensitive files
+        if all_results[status]['sensitive_files']:
+            print_color("\nSensitive Files Found:", Fore.RED)
+            for file in all_results[status]['sensitive_files']:
+                print(f"  {file}")
+        
+        # Print JS findings
+        if all_results[status]['js_findings']:
+            print_color("\nAPI Keys Found in JS Files:", Fore.BLUE)
+            for js, keys in all_results[status]['js_findings'].items():
+                print(f"  {js}:")
+                for key_type, key_value in keys:
+                    print(f"    {key_type}: {key_value}")
+
+if __name__ == "__main__":
+    main()
