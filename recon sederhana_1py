@@ -1,0 +1,108 @@
+saya mau live hunting bug bounty saya punya list subdomain tolong bantu buatkan saya script python untuk crawling dari  list subdomain yang saya punya mencari method POST dan GET dan PUT dengan respon code 200 dan 302 201 dan sertakan output nya yang rapi dan enak di baca hasil respon code nya di pisah misal hasil respon code 200 dengan methot apapun di pisah respon code 302 dengan method apapun serta crawling parameter yang dapat dicoba untuk injeck dengan menggunakan metod apapun dan respon code nya 200 302 dan 201
+
+pip install requests beautifulsoup4 urllib3 tqdm
+
+
+
+
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse, parse_qs
+import urllib3
+from tqdm import tqdm
+import os
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Configuration
+HEADERS = {"User-Agent": "Mozilla/5.0"}
+TIMEOUT = 10
+METHODS = ["GET", "POST", "PUT"]
+CODES_TO_SAVE = [200, 201, 302]
+CRAWL_DEPTH = 2  # Limit recursion depth
+
+# Storage
+results = {code: [] for code in CODES_TO_SAVE}
+injectable_params = []
+
+def get_file_path():
+    file_path = input("Masukkan path ke file subdomain.txt: ").strip()
+    while not os.path.isfile(file_path):
+        print("❌ File tidak ditemukan. Coba lagi.")
+        file_path = input("Masukkan path ke file subdomain.txt: ").strip()
+    return file_path
+
+def read_subdomains(file_path):
+    with open(file_path, 'r') as f:
+        return [line.strip() for line in f if line.strip()]
+
+def extract_links(html, base_url):
+    soup = BeautifulSoup(html, "html.parser")
+    links = set()
+    for tag in soup.find_all(["a", "form"]):
+        href = tag.get("href") or tag.get("action")
+        if href:
+            full_url = urljoin(base_url, href)
+            if base_url.split('//')[1].split('/')[0] in full_url:
+                links.add(full_url.split("#")[0])
+    return links
+
+def extract_params(url):
+    parsed = urlparse(url)
+    return list(parse_qs(parsed.query).keys())
+
+def test_methods(url):
+    for method in METHODS:
+        try:
+            response = requests.request(method, url, headers=HEADERS, timeout=TIMEOUT, verify=False)
+            if response.status_code in CODES_TO_SAVE:
+                results[response.status_code].append((method, url))
+                if method == "GET" and extract_params(url):
+                    injectable_params.append((url, extract_params(url)))
+        except requests.RequestException:
+            pass
+
+def crawl(url, visited, depth=0):
+    if depth > CRAWL_DEPTH or url in visited:
+        return
+    visited.add(url)
+
+    try:
+        res = requests.get(url, headers=HEADERS, timeout=TIMEOUT, verify=False)
+        if res.status_code in CODES_TO_SAVE:
+            results[res.status_code].append(("GET", url))
+            if extract_params(url):
+                injectable_params.append((url, extract_params(url)))
+
+        links = extract_links(res.text, url)
+        for link in links:
+            test_methods(link)
+            crawl(link, visited, depth + 1)
+    except requests.RequestException:
+        return
+
+def write_output():
+    os.makedirs("output", exist_ok=True)
+
+    for code in results:
+        with open(f"output/status_{code}.txt", "w") as f:
+            for method, url in results[code]:
+                f.write(f"[{method}] {url}\n")
+
+    with open("output/injectable_params.txt", "w") as f:
+        for url, params in injectable_params:
+            f.write(f"{url}\n  └─ Params: {', '.join(params)}\n")
+
+def main():
+    file_path = get_file_path()
+    subdomains = read_subdomains(file_path)
+    for sub in tqdm(subdomains, desc="Crawling Subdomains"):
+        if not sub.startswith("http"):
+            sub = "http://" + sub
+        crawl(sub, set())
+
+    write_output()
+    print("\n✅ Selesai! Hasil disimpan di folder 'output/'")
+
+if __name__ == "__main__":
+    main()
