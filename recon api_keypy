@@ -1,0 +1,144 @@
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse, parse_qs
+import urllib3
+from tqdm import tqdm
+import re
+import os
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+HEADERS = {"User-Agent": "Mozilla/5.0"}
+TIMEOUT = 10
+METHODS = ["GET", "POST", "PUT"]
+CODES_TO_SAVE = [200, 201, 302]
+CRAWL_DEPTH = 2
+
+results = {code: [] for code in CODES_TO_SAVE}
+injectable_params = []
+api_keys = []
+sensitive_files = []
+
+# Regex patterns for API keys and secrets (basic)
+API_KEY_PATTERNS = [
+    r'(?i)(api[_\-]?key|secret|token)[\'"\s:=]+[\'"]?([A-Za-z0-9_\-]{16,})',
+    r'AIza[0-9A-Za-z\-_]{35}',  # Google API Key
+    r'sk_live_[0-9a-zA-Z]{24}',  # Stripe key
+]
+
+SENSITIVE_PATHS = [
+    ".env", ".git/config", "config.php", "db.sql", "backup.zip", "backup.tar", "admin/config.yaml"
+]
+
+def get_file_path():
+    file_path = input("Masukkan path ke file subdomain.txt: ").strip()
+    while not os.path.isfile(file_path):
+        print("❌ File tidak ditemukan. Coba lagi.")
+        file_path = input("Masukkan path ke file subdomain.txt: ").strip()
+    return file_path
+
+def read_subdomains(file_path):
+    with open(file_path, 'r') as f:
+        return [line.strip() for line in f if line.strip()]
+
+def extract_links(html, base_url):
+    soup = BeautifulSoup(html, "html.parser")
+    links = set()
+    for tag in soup.find_all(["a", "form", "script"]):
+        href = tag.get("href") or tag.get("action") or tag.get("src")
+        if href:
+            full_url = urljoin(base_url, href)
+            if base_url.split('//')[1].split('/')[0] in full_url:
+                links.add(full_url.split("#")[0])
+    return links
+
+def extract_params(url):
+    parsed = urlparse(url)
+    return list(parse_qs(parsed.query).keys())
+
+def test_methods(url):
+    for method in METHODS:
+        try:
+            response = requests.request(method, url, headers=HEADERS, timeout=TIMEOUT, verify=False)
+            if response.status_code in CODES_TO_SAVE:
+                results[response.status_code].append((method, url))
+                if method == "GET" and extract_params(url):
+                    injectable_params.append((url, extract_params(url)))
+                check_js_for_keys(response, url)
+        except requests.RequestException:
+            pass
+
+def check_js_for_keys(response, url):
+    if url.endswith(".js") and response.status_code == 200:
+        for pattern in API_KEY_PATTERNS:
+            matches = re.findall(pattern, response.text)
+            if matches:
+                api_keys.append((url, matches))
+
+def check_sensitive_files(base_url):
+    for path in SENSITIVE_PATHS:
+        test_url = urljoin(base_url + "/", path)
+        for method in METHODS:
+            try:
+                res = requests.request(method, test_url, headers=HEADERS, timeout=TIMEOUT, verify=False)
+                if res.status_code == 200:
+                    sensitive_files.append((method, test_url))
+            except:
+                continue
+
+def crawl(url, visited, depth=0):
+    if depth > CRAWL_DEPTH or url in visited:
+        return
+    visited.add(url)
+
+    try:
+        res = requests.get(url, headers=HEADERS, timeout=TIMEOUT, verify=False)
+        if res.status_code in CODES_TO_SAVE:
+            results[res.status_code].append(("GET", url))
+            if extract_params(url):
+                injectable_params.append((url, extract_params(url)))
+            check_js_for_keys(res, url)
+
+        links = extract_links(res.text, url)
+        for link in links:
+            test_methods(link)
+            crawl(link, visited, depth + 1)
+    except requests.RequestException:
+        return
+
+def write_output():
+    os.makedirs("output", exist_ok=True)
+
+    for code in results:
+        with open(f"output/status_{code}.txt", "w") as f:
+            for method, url in results[code]:
+                f.write(f"[{method}] {url}\n")
+
+    with open("output/injectable_params.txt", "w") as f:
+        for url, params in injectable_params:
+            f.write(f"{url}\n  └─ Params: {', '.join(params)}\n")
+
+    with open("output/api_keys_found.txt", "w") as f:
+        for url, keys in api_keys:
+            f.write(f"{url}\n")
+            for k in keys:
+                f.write(f"  └─ {k}\n")
+
+    with open("output/sensitive_files_found.txt", "w") as f:
+        for method, url in sensitive_files:
+            f.write(f"[{method}] {url}\n")
+
+def main():
+    file_path = get_file_path()
+    subdomains = read_subdomains(file_path)
+    for sub in tqdm(subdomains, desc="Crawling Subdomains"):
+        if not sub.startswith("http"):
+            sub = "http://" + sub
+        crawl(sub, set())
+        check_sensitive_files(sub)
+
+    write_output()
+    print("\n✅ Selesai! Hasil disimpan di folder 'output/'")
+
+if __name__ == "__main__":
+    main()
