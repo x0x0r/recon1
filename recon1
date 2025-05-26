@@ -33,6 +33,10 @@ katana -list (kalo mau pake list ) finals.txt -jc | grep "".js$" -o finalkatana2
 katana -list finals.txt -jc -o finalkatana.txt | grep "".js$"
 
 
+pentests android
+
+https://mobsf.live/
+
 cari secret finder
 
 
