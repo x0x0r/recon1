@@ -114,6 +114,9 @@ The script loaded from the external URL specified in the Details section doesn't
 
 cara recon 
 
+pake post parallel
+
+#parallel -j 10 bash -c 'line="$1"; [[ "$line" == *"|"* ]] && url="${line%%|*}" && data="${line#*|}" && curl --proxy http://127.0.0.1:8080 -sk -X POST "$url" -H "Content-Type: application/json" -d "$data" > /dev/null || curl --proxy http://127.0.0.1:8080 -sk "$line" > /dev/null' _ {} ::: $(<gabunganresult.txt)
 
 1. magicrecon.sh -w ( domain )
 
