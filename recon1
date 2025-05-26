@@ -1,7 +1,7 @@
 https://leakix.net/graph
 
 http://www.javadecompilers.com/
-1. cari domain dengan subfinder
+1. cari domain dengan subfinders
 
 sunfinder -d test.com all -o test.txt
 
@@ -310,3 +310,9 @@ ffuf -u http://example.com/FUZZ -w /path/to/wordlist.txt -proxy http://127.0.0.1
 https://github.com/xiv3r?tab=repositories
 
 https://github.com/xiv3r/Burpsuite-Professional
+
+
+test
+
+
+https://soundcloud.com/ddeeddee?p=i&c=456456
