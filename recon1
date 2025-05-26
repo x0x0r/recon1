@@ -34,9 +34,9 @@ katana -list finals.txt -jc -o finalkatana.txt | grep "".js$"
 
 
 pentests android
-
+https://gitlab.com/newbit/rootAVD
 https://mobsf.live/
-
+https://gist.github.com/miaucl/b4b4b080080f0f2afaa46ba09d236985
 cari secret finder
 
 
