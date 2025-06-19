@@ -1,0 +1,1 @@
+arp-scan -l | grep "PCS" | awk '{print $1}'
